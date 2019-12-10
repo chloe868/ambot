@@ -23,7 +23,7 @@
           prepend-icon="mdi-map-marker"
           type="text"
           placeholder="Company Address"
-          v-model="defaultItem.vadress"
+          v-model="defaultItem.comaddress"
         >Company Number</v-text-field>
         <v-text-field
           class="sign-up"
@@ -32,7 +32,7 @@
           type="number"
           min="0"
           label=" Contact Number"
-          v-model="defaultItem.name"
+          v-model="defaultItem.vcontact"
         />
         <v-text-field
           readonly
@@ -40,7 +40,7 @@
           type="email"
           prepend-icon="mdi-email"
           placeholder=" Email"
-          v-model="defaultItem.name"
+          v-model="defaultItem.vemail"
         />
         <v-text-field
           class="sign-up"
@@ -58,7 +58,7 @@
           <v-btn
             @click="dialog= true"
             color="primary"
-            :disabled="oldpassword !== defaultItem.password"
+            :disabled="oldpassword !== defaultItem.vpassword"
           >Update profile</v-btn>
         </center>
         <v-dialog v-model="dialog" max-width="500px">
