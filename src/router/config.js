@@ -1,0 +1,7 @@
+let BACKEND_URL_LIVE='http://172.16.3.17:3000'
+let BACKEND_URL_DEV='http://172.16.3.17:3000'
+let isDev=false
+export default{
+    APP_NAME:'ABANG',
+    BACKEND_URL:isDev?BACKEND_URL_DEV:BACKEND_URL_LIVE
+}
