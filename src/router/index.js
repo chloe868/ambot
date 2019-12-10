@@ -45,8 +45,8 @@ const routes = [
     }
   },
   {
-    path:"/item",
-    name:"item",
+    path:"/items",
+    name:"items",
     component:items,
     meta: {
         tokenRequired: false

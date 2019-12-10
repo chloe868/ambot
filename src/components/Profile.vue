@@ -113,7 +113,7 @@ export default {
     return {
       user: {
         name: 0,
-        password: "gwapo"
+        vpassword: "gwapo"
       },
       files: "",
       oldpassword: "",
