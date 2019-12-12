@@ -1,8 +1,8 @@
 <template>
   <div>
-    <HeaderAdmin />
+    <HeaderAdmin/>
     <!-- -->
-    <v-data-table :headers="headers"  :items="vehicle" class="elevation-1">
+    <v-data-table :headers="headers" :items="vehicle" class="elevation-1">
       <template v-slot:top>
         <v-toolbar flat color="white">
           <v-toolbar-title>List of Items</v-toolbar-title>
@@ -17,81 +17,43 @@
                 <span class="headline">{{ formTitle }}</span>
               </v-card-title>
 
-             <v-card-text>
+              <v-card-text>
                 <v-container>
-                  <!-- <v-img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3TKS6OkngaenOk2gXHAuEziDGtxAJ2IhS0njI6G6_uOWbhSEe&s"
+                  <v-img
+                    :src="editedItem.imageSRC?editedItem.imageSRC:placeHolder"
                     height="200px"
-                  ></v-img> -->
+                    @click="$refs.file.click()"
+                  ></v-img>
                   <form enctype="multipart/form-data">
                     <div class="fields">
                       <label>Upload File</label>
                       <br>
-                      <v-file-input
-                        small-chips
-                        multiple
-                        v-model="images"
-                        label="Upload images"
-                      ></v-file-input>
+                      <input type="file" ref="file" @change="handleFileUpload">
                     </div>
                     <div class="fields">
                       <!-- <button @submit.prevent="onSubmit">Submit</button> -->
                     </div>
                   </form>
                   <v-row>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-select
-                        v-model="editedItem.name"
-                        :items="items"
-                        label="Standard"
-                      ></v-select>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select v-model="editedItem.name" :items="items" label="Standard"></v-select>
                       <!-- <v-text-field v-model="editedItem.name" label="Kind of Vehicle"></v-text-field> -->
                     </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.brand"
-                        label="Brand"
-                      ></v-text-field>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field v-model="editedItem.brand" label="Brand"></v-text-field>
                     </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
+                    <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.sitingcapacity"
                         type="Number"
                         label="Sitting Capacity"
                       ></v-text-field>
                     </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.location"
-                        label="Location"
-                      ></v-text-field>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field v-model="editedItem.location" label="Location"></v-text-field>
                     </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.rate"
-                        type="Number"
-                        label="Rate"
-                      ></v-text-field>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field v-model="editedItem.rate" type="Number" label="Rate"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -99,37 +61,43 @@
 
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="close"
-                >Cancel</v-btn>
-                <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="onSubmit"
-                >Save</v-btn>
+                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+                <v-btn color="blue darken-1" text @click="onSubmit">Save</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-icon
-          small
-          class="mr-2"
-          @click="editItem(item)"
-        >edit</v-icon>
-        <v-icon
-          small
-          @click="deleteItem(item)"
-        >delete</v-icon>
+        <v-icon small class="mr-2" @click="editItem(item)">edit</v-icon>
+        <v-icon small @click="deleteItem(item)">delete</v-icon>
+      </template>
+      <template v-slot:item.info="{ item }">
+        <v-dialog v-model="dialog2" width="500">
+          <template v-slot:activator="{ on }">
+            <v-icon small class="mr-2" v-on="on">mdi-information</v-icon>
+          </template>
+          <v-card>
+            <v-card-title class="headline grey lighten-2" primary-title>Details</v-card-title>
+
+            <v-card-text>
+              <img :src="'http://localhost:5000/files/'+ item.img">
+            </v-card-text>
+
+            <v-divider></v-divider>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="dialog2 = false">Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </template>
     </v-data-table>
   </div>
 </template>
 <script>
-import HeaderAdmin from "../components/HeaderAdmin.vue";
+import HeaderAdmin from "..//components/HeaderAdmin.vue";
 import axios from "axios";
 import helper from "../services/helper.js";
 export default {
@@ -138,28 +106,23 @@ export default {
   },
   data() {
     return {
+      dialog2: false,
       dialog: false,
       headers: [
-        {
-          text: "Image",
-          align: "left",
-          sortable: false,
-          value: "img"
-        },
         { text: "Type of Vehicle", value: "name", sortable: false },
         { text: "Brand", value: "brand", sortable: false },
         { text: "Sitting Capacity", value: "sit", sortable: false },
         { text: "Location", value: "loc", sortable: false },
         { text: "Rate", value: "rate", sortable: false },
-        { text: "Actions", value: "action", sortable: false }
+        { text: "Actions", value: "action", sortable: false },
+        { text: "", value: "info", sortable: false }
       ],
       items: ["Van", "Bus", "Motorcycle", "Boat"],
       editedIndex: -1,
-      images: [],
       vehicle: [],
-      formData: null,
+      placeHolder: "https://lakewangaryschool.sa.edu.au/wp-content/uploads/2017/11/placeholder-profile-sq.jpg",
       editedItem: {
-        imageSRC: "",
+        imageSRC: null,
         name: "",
         brand: "",
         sitingcapacity: 0,
@@ -181,11 +144,11 @@ export default {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     }
   },
-  watch: {
-    dialog(val) {
-      val || this.close();
-    }
-  },
+  // watch: {
+  //   dialog(val) {
+  //     val || this.close();
+  //   }
+  // },
   created() {
     //this.initialize();
     helper
@@ -213,13 +176,13 @@ export default {
   },
   methods: {
     dashboard() {
-      this.$router.push("/pageadmin");
+      this.$router.push("/");
     },
     notify() {
       this.$router.push("/notifications");
     },
     item() {
-      this.$router.push("/items");
+      this.$router.push("/item");
     },
     profile() {
       this.$router.push("/profile");
@@ -253,77 +216,49 @@ export default {
         this.editedIndex = -1;
       }, 300);
     },
-    // save() {
-    //    axios.post("http://localhost:5000/addItem",this.defaultItem).then(response => {
-    //     alert(response);
-    //     this.defaultItem ="";
-    //     console.log(defaultItem);
-    //   });
-    //   // if (this.editedIndex > -1) {
-    //   //   Object.assign(this.vehicle[this.editedIndex], this.editedItem);
-    //   // } else {
-    //   //   this.vehicle.push(this.editedItem);
-    //   // }
-    //   // this.close();
-    // },
-    checkImage(image) {
-      var err = false;
-      if (!allowedTypes.includes(image.type) && file.size > 500000) {
-        this.message = "Invalid file or image too large!";
-        errors = true;
-      }
-      return err;
-    },
-    onSelect() {
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-      if (this.images.length > 1) {
-        this.images.forEach(image => {
-          if (this.checkImage(image)) {
-            this.formData.append("img", image);
-          }
-        });
-      } else {
-        if (this.checkImage(this.images[0])) {
-          this.formData.append("img", this.images[0]);
-        }
-      }
-      // const file = this.$refs.file.files[0];
-      // this.file = file;
-      // if (!allowedTypes.includes(file.type)) {
-      //   this.message = "Filetype is wrong!!";
-      // }
-      // if (file.size > 500000) {
-      //   this.message = "Too large, max size allowed is 500kb";
-      // }
-      // console.log(file);
-    },
-    async onSubmit() {
-      if (this.formData) {
-        this.formData.append("details", JSON.stringify({}));
-        try {
-          await axios
-            .post("http://localhost:5000/uploadImage", this.formData, {
-              headers: {
-                "Content-Type": "multipart/form-data"
-              }
-            })
-            .then(resp => {
-              this.editedItem.imageSRC = resp.data.file.filename;
-              console.log("data: ", resp.data);
-              console.log("image: ", resp.data.file.filename);
-              helper
-                .addItem(this.editedItem)
-                .then(resp => {
-                  this.close();
-                })
-                .catch(err => {
-                  this.close();
-                });
-            });
-        } catch (err) {
-          console.log(err);
-          //this.message = err.response.file.error;
-        }
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0];
+      this.editedItem.imageSRC = URL.createObjectURL(this.file);
+      console.log(this.file);
+    }
+  },
+  async onSubmit() {
+    if (
+      this.editedItem.imageSRC == null ||
+      this.editedItem.name == "" ||
+      this.editedItem.brand == "" ||
+      this.editedItem.sitingcapacity == "" ||
+      this.editedItem.location == "" ||
+      this.editedItem.rate == ""
+    ) {
+      alert("all fields are required!!");
+    } else {
+      const formData = new FormData();
+      formData.append("file", this.file);
+      console.log(this.file);
+      try {
+        await axios
+          .post("http://localhost:5000/uploadImage", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data"
+            }
+          })
+          .then(resp => {
+            this.editedItem.imageSRC = resp.data.file.filename;
+            console.log("data: ", resp.data);
+            console.log("image: ", resp.data.file.filename);
+            helper
+              .addItem(this.editedItem)
+              .then(resp => {
+                this.close();
+              })
+              .catch(err => {
+                this.close();
+              });
+          });
+      } catch (err) {
+        console.log(err);
+        //this.message = err.response.file.error;
       }
     }
   }
